@@ -185,14 +185,14 @@ def train_epoch(model, train_data, y, loss_function, optimizer, i):
         sent = autograd.Variable(torch.LongTensor(tmp))
         label = autograd.Variable(torch.LongTensor([int(label)]))
         pred = model(sent)
-        pred_label = pred.data.max(1)[1].numpy()
+        pred_label = pred.max(1)[1].numpy()
         pred_res.append(pred_label)
         model.zero_grad()
         loss = loss_function(pred, label)
-        avg_loss += loss.data[0]
+        avg_loss += loss.data
         count += 1
         if count % 500 == 0:
-            print('epoch: %d iterations: %d loss :%g' % (i, count, loss.data[0]))
+            print('epoch: %d iterations: %d loss :%g' % (i, count, loss.data))
         loss.backward()
         optimizer.step()
     avg_loss /= len(train_data)
@@ -219,7 +219,7 @@ def evaluate(model, test_data, test_y, loss_function, name ='dev'):
         pred_res.append(pred_label)
         # model.zero_grad() # should I keep this when I am evaluating the model?
         loss = loss_function(pred, label)
-        avg_loss += loss.data[0]
+        avg_loss += loss.data
     avg_loss /= len(test_data)
     acc = get_accuracy(truth_res, pred_res)
     print(name + ' avg_loss:%g train acc:%g' % (avg_loss, acc ))
